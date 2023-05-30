@@ -1,0 +1,11 @@
+FROM ubuntu:latest
+RUN apt-get update && apt-get -y install \
+  shfmt \
+  shellcheck \
+  shunit2 \
+  ash \
+  bash \
+  dash \
+  ksh \
+  mksh \
+  zsh

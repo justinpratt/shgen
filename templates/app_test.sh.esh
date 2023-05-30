@@ -1,0 +1,66 @@
+#!/bin/sh
+
+<%= $SHGEN_APP_UPCASE %>_DIR="${<%= $SHGEN_APP_UPCASE %>_DIR:-$(cd -P "$(dirname "$0")" && printf '%s' "$(pwd -P)")}"
+
+if [ -n "${ZSH_VERSION:-}" ]; then
+  setopt shwordsplit
+  export SHUNIT_PARENT="$0"
+fi
+
+test_<%= $SHGEN_APP_DOWNCASE %>_main() {
+  msg=$(<%= $SHGEN_APP_DOWNCASE %>_main '')
+  assertEquals 0 $?
+  assertEquals 'Hello, world!' "$msg"
+}
+
+test_<%= $SHGEN_APP_DOWNCASE %>_main_msg() {
+  msg=$(<%= $SHGEN_APP_DOWNCASE %>_main 'Goodbye, cruel world!')
+  assertEquals 0 $?
+  assertEquals 'Goodbye, cruel world!' "$msg"
+}
+
+NOW='Fri Apr 28 12:20:00 PDT 2023'
+date() {
+  if [ "$__date_result" -eq 0 ]; then
+    printf '%s\n' "$NOW"
+  fi
+  return "$__date_result"
+}
+
+test_hello_with_date_fail() {
+  __date_result=1
+  msg=$(hello_with_date)
+  assertEquals 1 $?
+  assertEquals '' "$msg"
+}
+
+test_hello_with_date() {
+  msg=$(hello_with_date)
+  assertEquals 0 $?
+  assertEquals 'Hello, the current date is Fri Apr 28 12:20:00 PDT 2023' "$msg"
+}
+
+touch() {
+  echo "touch $*" >>"$__mocked_cmds_f"
+}
+
+test_touch_file() {
+  touch_files
+  assertEquals 0 $?
+  assertEquals "touch one
+touch two
+touch three" "$(cat "${__mocked_cmds_f}")"
+}
+
+setUp() {
+  export __date_result=0
+  export __mocked_cmds_f="${SHUNIT_TMPDIR}/mocked_cmds"
+  cat /dev/null >"$__mocked_cmds_f"
+}
+
+oneTimeSetUp() {
+  . "${<%= $SHGEN_APP_UPCASE %>_DIR}/<%= $SHGEN_APP_DOWNCASE %>_lib.sh"
+}
+
+# shellcheck disable=all
+. "$(command -v shunit2)"

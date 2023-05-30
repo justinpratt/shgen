@@ -1,0 +1,16 @@
+#!/bin/sh -e
+
+platforms="ubuntu alpine"
+
+for platform in ${platforms}; do
+  printf '\n##############################\n# %s\n' "${platform}"
+  docker buildx build -f "Dockerfile.${platform}" -t "${platform}-<%= $SHGEN_APP_DOWNCASE %>" .
+  docker buildx build -f- -t "${platform}-<%= $SHGEN_APP_DOWNCASE %>-test" . <<HERE
+FROM ${platform}-<%= $SHGEN_APP_DOWNCASE %>
+RUN mkdir /app
+COPY ./ /app/
+WORKDIR /app
+CMD ./test.sh
+HERE
+  docker run -it --rm "${platform}-<%= $SHGEN_APP_DOWNCASE %>-test"
+done

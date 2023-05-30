@@ -1,0 +1,73 @@
+#!/bin/sh
+
+if [ -n "${<%= $SHGEN_APP_UPCASE %>_VERSION:-}" ]; then
+  return 0
+fi
+if [ -n "${ZSH_VERSION:-}" ]; then
+  # shellcheck disable=SC3010
+  if ! [[ -o shwordsplit ]]; then
+    printf '%s\n%s\n\n' \
+      'Sourcing this library from zsh requires the shwordsplit option, e.g.:' \
+      'setopt shwordsplit' >&2
+    return 0
+  fi
+fi
+<%= $SHGEN_APP_UPCASE %>_VERSION='0.0.1'
+
+_<%= $SHGEN_APP_DOWNCASE %>_cleanup() {
+  # cleanup code goes here
+  :
+}
+
+_<%= $SHGEN_APP_DOWNCASE %>_usage() {
+  cat <<HERE
+NAME
+    <%= $SHGEN_APP_DOWNCASE %>.sh - <%= $SHGEN_APP_NAME %>
+
+SYNOPSIS
+    <%= $SHGEN_APP_DOWNCASE %>.sh [-e] [msg]
+
+DESCRIPTION
+    Do something useful.
+
+    The following options are available:
+
+    -e    Some option.
+
+    A note about argument msg.
+HERE
+}
+
+<%= $SHGEN_APP_DOWNCASE %>_main() {
+  while getopts 'e' opt; do
+    case "$opt" in
+      e)
+        # process option
+        ;;
+      ?)
+        _<%= $SHGEN_APP_DOWNCASE %>_usage
+        exit 1
+        ;;
+    esac
+    shift
+  done
+  printf '%s\n' "${1:-Hello, world!}"
+  return 0
+}
+
+hello_with_date() (
+  if ! _date=$(date); then
+    return 1
+  fi
+  printf 'Hello, the current date is %s\n' "$_date"
+  return 0
+)
+
+touch_files() (
+  for f in one two three; do
+    if ! touch "$f"; then
+      return 1
+    fi
+  done
+  return 0
+)

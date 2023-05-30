@@ -1,0 +1,11 @@
+#!/bin/sh
+
+<%= $SHGEN_APP_UPCASE %>_DIR="${<%= $SHGEN_APP_UPCASE %>_DIR:-$(cd -P "$(dirname "$0")" && printf '%s' "$(pwd -P)")}"
+if [ -n "${ZSH_VERSION:-}" ]; then
+  setopt shwordsplit
+fi
+
+. "${<%= $SHGEN_APP_UPCASE %>_DIR}/<%= $SHGEN_APP_DOWNCASE %>_lib.sh"
+
+trap '_<%= $SHGEN_APP_DOWNCASE %>_cleanup' 1 2 3 6
+<%= $SHGEN_APP_DOWNCASE %>_main "$@"
